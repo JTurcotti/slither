@@ -42,6 +42,19 @@ enum Direction {
 }
 
 Direction direction(PVector v1, PVector v2) {
+    if ((v2.x < v1.x) && (v2.y <= v1.y))
+	return Direction.NW;
+    if ((v2.x >= v1.x) && (v2.y < v1.y))
+	return Direction.NE;
+    if ((v2.x > v1.x) && (v2.y >= v1.y))
+	return Direction.SE;
+    if ((v2.x <= v1.x) && (v2.y > v1.y))
+	return Direction.SW;
+
+    throw new IllegalStateException("direction calc went wrong " + v1 + " " + v2);
+
+    
+    /*
     float angle = PVector.sub(v2, v1).heading();
     if (angle > 0)
 	if (angle < HALF_PI)
@@ -53,4 +66,5 @@ Direction direction(PVector v1, PVector v2) {
 	    return Direction.NE;
 	else
 	    return Direction.NW;
+    //*/
 }

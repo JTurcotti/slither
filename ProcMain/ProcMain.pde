@@ -40,13 +40,6 @@ void setup() {
     thingsToDraw.addAll(foodSet);
 
     foodTree.addAll(foodSet);
-
-    println("NW " + gameArea.vertex(Direction.NW));
-    println("NE " + gameArea.vertex(Direction.NE));
-    println("SW " + gameArea.vertex(Direction.SW));
-    println("SE " + gameArea.vertex(Direction.SE));
-	
-	
 }
 
 void draw() {

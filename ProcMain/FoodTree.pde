@@ -10,7 +10,17 @@ class Node {
     Node(Food value, int depth) {
 	this.value = value;
 	this.depth = depth;
-	this.value.fillColor = depth*10;
+	this.value.fillColor = depth*20;
+    }
+
+    Collection<Node> children() {
+	List<Node> children = new LinkedList<Node>();
+	for (Direction d: Direction.values()) {
+	    Node child = next.get(d);
+	    if (child != null)
+		children.add(child);
+	}
+	return children;
     }
 }
 
@@ -30,7 +40,6 @@ public class FoodTree {
 	layer = 0;
 	maxDepth = 0;
 	root = add(root, value); //returns root unless root is null
-	println("Max Deoth: " + maxDepth);
     }
 
     private Node add(Node n, Food value) {
@@ -72,19 +81,19 @@ public class FoodTree {
 	    children.push(n);
 	    while (!children.empty()) {
 		Node child = children.pop();
-		for (Direction d: Direction.values()) {
-		    Node grandchild = child.next.get(d);
+		for (Node grandchild: child.children()) {
 		    if (grandchild != null) {
 			add(grandchild.value);
 			children.push(grandchild);
 		    }
 		}
 	    }
+	} else {
+	    
+	    //go to next node in right direction
+	    Direction d = direction(n.value.pos, value.pos);
+	    remove(n.next.get(d), value);
 	}
-
-	//go to next node in right direction
-	Direction d = direction(n.value.pos, value.pos);
-	remove(n.next.get(d), value);
     }
     
     
@@ -101,9 +110,25 @@ public class FoodTree {
 	if (rect.contains(n.value.pos))
 	    found.add(n.value);
 
-	for (Direction d: Direction.values())
+	for (Direction d: Direction.values()) {
 	    if (direction(n.value.pos, rect.vertex(d.opposite)) == d)
 		within(rect, n.next.get(d), found);
+	}
+    }
+
+    //inffecicent, should be used only for debugging
+
+    public boolean contains(Food value) {
+	return contains(root, value);
+    }
+
+    private boolean contains(Node n, Food value) {
+	if (n==null) return false;
+	if (n.value == value) return true;
+	for (Node child: n.children())
+	    if (contains(child, value))
+		return true;
+	return false;
     }
 
 }

@@ -41,7 +41,7 @@ public class Snake implements Drawable {
 	for (Food food: foodTree.within(bounds)) {
 	    if ((food.pos).dist(head.pos) <= radius + 5) { //tolerance is annoying but slightly necessary
 		println(foodEaten++);
-		//foodTree.remove(food);
+		foodTree.remove(food);
 		thingsToDraw.remove(food);
 	    }
 	}
