@@ -5,9 +5,12 @@ class Node {
     Map<Direction, Node> next = new HashMap<Direction, Node>();
     Node prev;
     Direction whichChild;
+    int depth;
 
-    Node(Food value) {
+    Node(Food value, int depth) {
 	this.value = value;
+	this.depth = depth;
+	this.value.fillColor = depth*10;
     }
 }
 
@@ -18,22 +21,35 @@ public class FoodTree {
 	for (Food value: values)
 	    add(value);
     }
+
+    int layer;
+    int maxDepth;
     
     //wrapper add function, begins at root
     public void add(Food value) {
+	layer = 0;
+	maxDepth = 0;
 	root = add(root, value); //returns root unless root is null
+	println("Max Deoth: " + maxDepth);
     }
 
     private Node add(Node n, Food value) {
 	if (n == null)
 	    //if reached the end of a tree (or no tree to begin with) create a new node
-	    return new Node(value); //pass new node
+	    return new Node(value, layer); //pass new node
 
 	Direction d = direction(n.value.pos, value.pos);
+
+	layer++;
+	if (layer>maxDepth) maxDepth = layer;
 	Node child = add(n.next.get(d), value);
+	layer--;
+	
 	if (child.prev == null) {
 	    child.prev = n;
 	    child.whichChild = d;
+	    if (n.depth - child.depth != -1)
+		throw new IllegalStateException("depth fucked up");
 	}
 	n.next.put(d, child); //when done, put back passed node
 

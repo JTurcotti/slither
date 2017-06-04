@@ -1,19 +1,23 @@
 Snake s; // the player's snake
 PVector screenCenter; //stores the center of the screen
+PVector translation; //current board translation
 int gameRadius = 4096; //gameboard of sidelength gameradius * 2
 Rectangle screen;
 Rectangle gameArea;
 float foodDensity = .00005; //food per pixel
-Set<Drawable> thingsToDraw = new HashSet<Drawable>(); //all things to draw
+Queue<Drawable> thingsToDraw = new ArrayDeque<Drawable>(); //all things to draw
 FoodTree foodTree = new FoodTree();;
 int foodEaten = 0; //food eaten so far
+int time = 0;
+
+boolean alive = true; //is the snake moving?
 
 int randomColor() {
     return color(int(random(256)), int(random(256)), int(random(256)));
 }
 
-boolean onScreen(PVector actual, PVector trans) {
-    PVector virtual = PVector.add(actual, trans);
+boolean onScreen(PVector actual) {
+    PVector virtual = PVector.add(actual, translation);
     return screen.contains(virtual);
 }
 
@@ -26,29 +30,40 @@ void setup() {
     background(#FFFFFF);
     ellipseMode(RADIUS);
 
+    Collection<Boundary> bounds = genBounds();
+    thingsToDraw.addAll(bounds);
+    
     s = new Snake();
     thingsToDraw.add(s);
-    
-    Set<Food> foodSet = scatterFood(int(gameRadius * gameRadius * foodDensity));
+
+    Collection<Food> foodSet = scatterFood(int(gameRadius * gameRadius * foodDensity));
     thingsToDraw.addAll(foodSet);
 
     foodTree.addAll(foodSet);
+
+    println("NW " + gameArea.vertex(Direction.NW));
+    println("NE " + gameArea.vertex(Direction.NE));
+    println("SW " + gameArea.vertex(Direction.SW));
+    println("SE " + gameArea.vertex(Direction.SE));
+	
 	
 }
 
-int i=0;
 void draw() {
-    if (i++%10==0) return;
+    time++;
+    if (!alive) return;
+    //    if (time%10==0) return;
+    
     background(#FFFFFF);
     
     PVector delta = new PVector(mouseX, mouseY).sub(screenCenter);
     s.step(delta);
     
-    PVector trans = PVector.sub(screenCenter, s.head.pos);
-    translate(trans.x, trans.y);
+    translation = PVector.sub(screenCenter, s.head.pos);
+    translate(translation.x, translation.y);
 
     for (Drawable thing: thingsToDraw)
-	if (onScreen(thing.pos(), trans))
+	if (onScreen(thing.pos()))
 	    thing.draw();
     
 }

@@ -23,6 +23,8 @@ public class Snake implements Drawable {
     public void step(PVector delta) {
 	grow(delta);
 	eat();
+	if (!gameArea.contains(head.pos))
+	    alive = false;
     }
     
     private void grow(PVector d) {

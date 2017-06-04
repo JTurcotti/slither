@@ -1,6 +1,6 @@
 import java.util.*;
 
-Set<Food> scatterFood(int num) {
+Collection<Food> scatterFood(int num) {
     Set<Food> food = new HashSet<Food>();
     while (num-->0) {
 	PVector pos = new PVector(int(random(2 * gameRadius)) - gameRadius,

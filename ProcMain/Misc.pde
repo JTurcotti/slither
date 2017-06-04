@@ -11,8 +11,8 @@ class Rectangle {
 
 	vertices.put(Direction.NW, new PVector(x1, y1));
 	vertices.put(Direction.NE, new PVector(x2, y1));
-	vertices.put(Direction.SE, new PVector(x1, y2));
-	vertices.put(Direction.SW, new PVector(x2, y2));
+	vertices.put(Direction.SE, new PVector(x2, y2));
+	vertices.put(Direction.SW, new PVector(x1, y2));
     }
 
     boolean contains(float x, float y) {
