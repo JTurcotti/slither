@@ -6,6 +6,10 @@ public class Circle implements Drawable{
     int fillColor;
     int strokeColor;
 
+    PVector pos() {
+	return pos;
+    }
+
     public Circle(PVector pos, int radius, int fillColor, int strokeColor) {
 	this.pos = pos;
 	this.radius = radius;

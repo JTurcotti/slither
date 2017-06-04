@@ -6,23 +6,27 @@ public class Snake implements Drawable {
     int fillColor;
     int strokeColor;
     int radius = 50;
-    int length = 15;
+    int length = 50;
     int speed = 10;
 
+    PVector pos() {
+	return head.pos;
+    }
+    
     public Snake() {
-	fillColor = color(int(random(256)), int(random(256)), int(random(256)));
+	fillColor = randomColor();
 	strokeColor = #000000;
 	head = new Circle(screenCenter, radius, fillColor, strokeColor);
 	body.add(head);
     }
 
-    public void grow(PVector delta) {
+    public void grow(PVector d) {
+	PVector delta = d.normalize().mult(speed); 
 	PVector newPos = PVector.add(head.pos, delta);
 	head = new Circle(newPos, radius, fillColor, strokeColor);
 	body.add(head);
-	if (false && body.size() > length)
+	if (body.size() > length)
 	    body.remove();
-
     }
 
     public void draw() {
