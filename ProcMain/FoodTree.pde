@@ -115,6 +115,19 @@ public class FoodTree implements Iterable<Node> {
 	}
     }
 
+    public Food nearestTo(PVector v) {
+	return nearestTo(root, v);
+    }
+
+    private Food nearestTo(Node n, PVector v) {
+	Direction d = direction(n.value.pos, v);
+	Node child = n.next.get(d);
+	if (child==null)
+	    return n.value;
+	return nearestTo(child, v);
+    }
+	
+
     public Iterator<Node> iterator() {
 	return toNodeList().iterator();
     }

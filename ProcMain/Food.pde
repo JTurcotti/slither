@@ -3,8 +3,7 @@ import java.util.*;
 Collection<Food> scatterFood(int num) {
     Set<Food> food = new HashSet<Food>();
     while (num-->0) {
-	PVector pos = new PVector(int(random(2 * gameRadius)) - gameRadius,
-				  int(random(2 * gameRadius)) - gameRadius);
+	PVector pos = randomPos();
 	int fillColor = randomColor();
 	int radius = 10 + int(random(10));
 	food.add(new Food(pos, fillColor, radius));

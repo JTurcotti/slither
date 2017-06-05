@@ -1,11 +1,12 @@
-Snake snake; // the player's snake
+PlayerSnake snake; //the player's snake
 PVector screenCenter; //stores the center of the screen
 PVector translation; //current board translation
-final int gameRadius = 4096; //gameboard of sidelength gameradius * 2
+final int GAME_RADIUS = 8192; //gameboard of sidelength gameradius * 2
 Rectangle screen;
 Rectangle gameArea;
-final float foodDensity = .00005; //food per pixel
+final float FOOD_DENSITY = .00005; //food per pixel
 final Deque<Drawable> thingsToDraw = new ArrayDeque<Drawable>(); //all things to draw
+final List<Snake> thingsToDo = new LinkedList<Snake>(); //all things to do/move
 final FoodTree foodTree = new FoodTree();
 int foodEaten = 0; //food eaten so far
 int time = 0; //number of times draw executed
@@ -13,12 +14,19 @@ final long maxMinTimeMillis = 20; //maximum minimum time between draws
 long minTimeMillis = 0; //minimum time between draws
 long lastTimeMillis = System.currentTimeMillis(); //time of last draw
 
+final int NUM_SNAKES = 20;
+
 boolean bounded = true; //for debugging, bound the snake yes or no?
 boolean alive = true; //is the snake moving?
 boolean mouseMode = false;
 
 int randomColor(int tone) {
     return color(int(random(tone)), int(random(tone)), int(random(tone)));
+}
+
+PVector randomPos() {
+    	return new PVector(int(random(2 * GAME_RADIUS)) - GAME_RADIUS,
+			   int(random(2 * GAME_RADIUS)) - GAME_RADIUS);
 }
 
 int randomColor() {
@@ -30,6 +38,12 @@ boolean onScreen(PVector actual) {
     return screen.contains(virtual);
 }
 
+void doAllThings() {
+    if (!alive) return;
+    for (Snake s: thingsToDo)
+	s.step();
+}
+
 void drawAllThings() {
     translation = PVector.sub(screenCenter, snake.head.pos);
     translate(translation.x, translation.y);
@@ -37,7 +51,7 @@ void drawAllThings() {
     for (Drawable thing: thingsToDraw)
 	if (onScreen(thing.pos()))
 	    thing.draw();
-    
+
     /*
     for (Node n: foodTree) {
 	if (n.next.get(Direction.NW) != null) {
@@ -73,8 +87,8 @@ void setup() {
     size(2048, 2048);
     screenCenter = new PVector(width/2, height/2);
     screen = new Rectangle(0, width, 0, height);
-    gameArea = new Rectangle(-1 * gameRadius, gameRadius,
-			     -1 * gameRadius, gameRadius);
+    gameArea = new Rectangle(-1 * GAME_RADIUS, GAME_RADIUS,
+			     -1 * GAME_RADIUS, GAME_RADIUS);
     background(#FFFFFF);
     ellipseMode(RADIUS);
 
@@ -83,8 +97,15 @@ void setup() {
     
     snake = new PlayerSnake();
     thingsToDraw.add(snake);
+    thingsToDo.add(snake);
 
-    Collection<Food> foodSet = scatterFood(int(gameRadius * gameRadius * foodDensity));
+    for (int i=0; i<NUM_SNAKES; i++) {
+	Snake s = new ComputerSnake();
+	thingsToDraw.add(s);
+	thingsToDo.add(s);
+    }
+    
+    Collection<Food> foodSet = scatterFood(int(GAME_RADIUS * GAME_RADIUS * FOOD_DENSITY));
     thingsToDraw.addAll(foodSet);
 
     foodTree.addAll(foodSet);
@@ -100,13 +121,13 @@ void draw() {
 	    
     time++;
     background(#FFFFFF);
-    if (alive) {
-	snake.doTurn();
-    }
+    
+    doAllThings();
 
     if (mousePressed) {
 	snake.speedUp();
     }
+    
     drawAllThings();
 }
 
@@ -114,4 +135,6 @@ void keyReleased() {
     if (key == ' ') 
 	alive = !alive;
 }
+
+
 

@@ -8,11 +8,13 @@ abstract public class Snake implements Drawable {
     int speed = 10;
     int health = 0;
     int skip = 4;
-    final int SKIP_MAX = 3;
+    PVector heading = new PVector(1, 0);
+    final int SKIP_MAX = 2;
     final int SKIP_MIN = 1;
     protected boolean speedMode = false;
     final int DEC_STEP = 1;
     final int INC_STEP = 1;
+    final int TURN_RATE = 4; //higher to turn faster. 0 to not turn
 
     PVector pos() {
 	return head.pos;
@@ -29,16 +31,14 @@ abstract public class Snake implements Drawable {
     abstract protected int level();
     abstract protected int radius();
     abstract protected int length();
-
-    //turn wrapper
-    abstract public void doTurn();
-
+    abstract protected PVector nextHeading();
 
     //neccesary things that must happen for all snakes
-    protected void step(PVector delta) {
+    public void step() {
 	if (time%skip!=0) return;
 	System.out.println(health);
-	grow(delta);
+	heading = PVector.add(heading, nextHeading().mult(TURN_RATE)).normalize();
+	grow(heading);
 	eat();
 	shrink();
 	doHealth();
@@ -47,7 +47,7 @@ abstract public class Snake implements Drawable {
     }
     
     protected void grow(PVector d) {
-	PVector delta = d.normalize().mult(speed); 
+	PVector delta = d.mult(speed); 
 	PVector newPos = PVector.add(head.pos, delta);
 	head = new Circle(newPos, radius(), fillColor, strokeColor);
 	body.add(head);
@@ -121,7 +121,7 @@ public class PlayerSnake extends Snake {
     
     @Override
     protected int radius() {
-	return Math.max(30, 2*Math.pow(foodEaten, 0.5));
+	return Math.max(30, int(2*sqrt(foodEaten)));
     }
 
     @Override
@@ -130,11 +130,12 @@ public class PlayerSnake extends Snake {
     }
 
     @Override
-    public void doTurn() {
-	PVector delta = new PVector(mouseX, mouseY).sub(screenCenter);
-	step(delta);
+    protected PVector nextHeading() {
+	return new PVector(mouseX, mouseY)
+	    .sub(screenCenter)
+	    .normalize();
     }
-
+    
     public PlayerSnake() {
 	initAt(screenCenter);
     }
@@ -144,6 +145,36 @@ public class PlayerSnake extends Snake {
 	int eaten = super.eat();
 	foodEaten += eaten;
 	return eaten;
+    }
+}
+
+public class ComputerSnake extends Snake {
+    int level;
+    int radius;
+    int length;
+    
+    @Override
+    protected int level() {
+	return level;}
+    @Override
+    protected int radius() {
+	return radius;}
+    @Override
+    protected int length() {
+	return length;}
+
+    @Override
+    protected PVector nextHeading() {
+	return PVector
+	    .sub(foodTree.nearestTo(head.pos).pos, head.pos)
+	    .normalize();
+    }
+    
+    public ComputerSnake() {
+	initAt(randomPos());
+	level = 100 + int(random(50));
+	radius = 30 + int(random(10));
+	length = 50 + int(random(20));
     }
 }
 
