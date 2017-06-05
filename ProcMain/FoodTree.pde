@@ -10,7 +10,6 @@ class Node {
     Node(Food value, int depth) {
 	this.value = value;
 	this.depth = depth;
-	this.value.fillColor = depth*20;
     }
 
     Collection<Node> children() {
@@ -47,7 +46,9 @@ public class FoodTree implements Iterable<Node> {
 	    //if reached the end of a tree (or no tree to begin with) create a new node
 	    return new Node(value, layer); //pass new node
 
-	println(2);
+	if (n.value == value)
+	    return n;
+	
 	Direction d = direction(n.value.pos, value.pos);
 
 	layer++;
@@ -85,7 +86,6 @@ public class FoodTree implements Iterable<Node> {
 	} else {
 	    
 	    //go to next node in right direction
-	    println(3)
 	    Direction d = direction(n.value.pos, value.pos);
 	    remove(n.next.get(d), value);
 	}
@@ -109,7 +109,6 @@ public class FoodTree implements Iterable<Node> {
 	    found.add(n.value);
 
 	for (Direction d: Direction.values()) {
-	    println(1);
 	    if (direction(n.value.pos, rect.vertex(d)) == d) {
 		within(rect, n.next.get(d), found);
 	    }

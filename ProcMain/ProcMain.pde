@@ -1,16 +1,19 @@
-Snake s; // the player's snake
+Snake snake; // the player's snake
 PVector screenCenter; //stores the center of the screen
 PVector translation; //current board translation
-int gameRadius = 1200; //gameboard of sidelength gameradius * 2
+final int gameRadius = 4096; //gameboard of sidelength gameradius * 2
 Rectangle screen;
 Rectangle gameArea;
-float foodDensity = .00005; //food per pixel
-Deque<Drawable> thingsToDraw = new ArrayDeque<Drawable>(); //all things to draw
-FoodTree foodTree = new FoodTree();
+final float foodDensity = .00005; //food per pixel
+final Deque<Drawable> thingsToDraw = new ArrayDeque<Drawable>(); //all things to draw
+final FoodTree foodTree = new FoodTree();
 int foodEaten = 0; //food eaten so far
-int time = 0;
+int time = 0; //number of times draw executed
+final long maxMinTimeMillis = 20; //maximum minimum time between draws
+long minTimeMillis = 0; //minimum time between draws
+long lastTimeMillis = System.currentTimeMillis(); //time of last draw
 
-boolean bounded = false; //for debugging, bound the snake yes or no?
+boolean bounded = true; //for debugging, bound the snake yes or no?
 boolean alive = true; //is the snake moving?
 boolean mouseMode = false;
 
@@ -24,17 +27,13 @@ boolean onScreen(PVector actual) {
 }
 
 void drawAllThings() {
-    translation = PVector.sub(screenCenter, s.head.pos);
+    translation = PVector.sub(screenCenter, snake.head.pos);
     translate(translation.x, translation.y);
 
-    Rectangle r = s.head.bounds();
-    thingsToDraw.addFirst(r);
-    
     for (Drawable thing: thingsToDraw)
 	if (onScreen(thing.pos()))
 	    thing.draw();
-    thingsToDraw.remove(r);
-
+    
     /*
     for (Node n: foodTree) {
 	if (n.next.get(Direction.NW) != null) {
@@ -78,8 +77,8 @@ void setup() {
     Collection<Boundary> bounds = genBounds();
     if (bounded) thingsToDraw.addAll(bounds);
     
-    s = new Snake();
-    thingsToDraw.add(s);
+    snake = new Snake();
+    thingsToDraw.add(snake);
 
     Collection<Food> foodSet = scatterFood(int(gameRadius * gameRadius * foodDensity));
     thingsToDraw.addAll(foodSet);
@@ -88,33 +87,23 @@ void setup() {
 }
 
 void draw() {
+    if (System.currentTimeMillis() - lastTimeMillis < minTimeMillis)
+	return;
+    lastTimeMillis = System.currentTimeMillis();
+    minTimeMillis = maxMinTimeMillis; //reset min to maxmin
+	    
     time++;
     background(#FFFFFF);
     if (alive) {
 	PVector delta = new PVector(mouseX, mouseY).sub(screenCenter);
-	s.step(delta);
+	snake.step(delta);
     }
 
-    Rectangle r = null;
-    if (mouseMode) {
-	r = new Rectangle(mouseX-50-int(translation.x),
-			  mouseX+50-int(translation.x),
-			  mouseY-50-int(translation.y),
-			  mouseY+50-int(translation.y));
-	thingsToDraw.addFirst(r);
-	for (Food f: foodTree.within(r)) {
-	    println(f.pos + " found");
-	    f.fillColor = color(0, 0, 255);
-	}
+    if (mousePressed && snake.health>0) {
+	snake.health-=2;
+	minTimeMillis = maxMinTimeMillis/4;//speed up cycles by x4
     }
-
-    
     drawAllThings();
-    if (mouseMode) {
-	thingsToDraw.remove(r);
-	for (Node n: foodTree)
-	    n.value.fillColor = color(140);
-    }
 }
 
 void keyReleased() {

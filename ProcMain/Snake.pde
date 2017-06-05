@@ -5,9 +5,9 @@ public class Snake implements Drawable {
     Circle head; //"actual" head (tail of real deque)
     int fillColor;
     int strokeColor;
-    int radius = 50;
-    int length = 50;
+    int radius = 35;
     int speed = 10;
+    int health = 0;
 
     PVector pos() {
 	return head.pos;
@@ -21,8 +21,11 @@ public class Snake implements Drawable {
     }
 
     public void step(PVector delta) {
+	System.out.println(health);
 	grow(delta);
 	eat();
+	shrink();
+	incHealth();
 	if (bounded && !gameArea.contains(head.pos))
 	    alive = false;
     }
@@ -32,8 +35,16 @@ public class Snake implements Drawable {
 	PVector newPos = PVector.add(head.pos, delta);
 	head = new Circle(newPos, radius, fillColor, strokeColor);
 	body.add(head);
-	if (body.size() > length)
+    }
+
+    private void shrink() {
+	if (body.size() > Math.max(10, foodEaten/10))
 	    body.remove();
+    }
+
+    public void incHealth() {
+	if (health <= foodEaten)
+	    health+=1;
     }
 
     private void eat() {
@@ -41,6 +52,7 @@ public class Snake implements Drawable {
 	for (Food food: foodTree.within(bounds)) {
 	    if ((food.pos).dist(head.pos) <= radius + 5) { //tolerance is annoying but slightly necessary
 		//println(foodEaten++);
+		foodEaten+=food.radius;
 		foodTree.remove(food);
 		thingsToDraw.remove(food);
 	    }

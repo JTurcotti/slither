@@ -6,7 +6,7 @@ Collection<Food> scatterFood(int num) {
 	PVector pos = new PVector(int(random(2 * gameRadius)) - gameRadius,
 				  int(random(2 * gameRadius)) - gameRadius);
 	int fillColor = randomColor();
-	int radius = 10 + int(random(5));
+	int radius = 10 + int(random(10));
 	food.add(new Food(pos, fillColor, radius));
     }
     return food;
