@@ -1,32 +1,41 @@
 import java.util.*;
 
-public class Snake implements Drawable {
+abstract public class Snake implements Drawable {
     Queue<Circle> body = new ArrayDeque<Circle>(); //head represents "tail" of snake
     Circle head; //"actual" head (tail of real deque)
     int fillColor;
     int strokeColor;
-    int radius = 35;
     int speed = 10;
     int health = 0;
     int skip = 4;
     final int SKIP_MAX = 3;
     final int SKIP_MIN = 1;
-    private boolean speedMode = false;
+    protected boolean speedMode = false;
     final int DEC_STEP = 1;
     final int INC_STEP = 1;
 
     PVector pos() {
 	return head.pos;
     }
-    
-    public Snake() {
+
+    protected void initAt(PVector pos) {
 	fillColor = randomColor(128);
 	strokeColor = randomColor(128) + #888888;
-	head = new Circle(screenCenter, radius, fillColor, strokeColor);
+	head = new Circle(pos, radius(), fillColor, strokeColor);
 	body.add(head);
     }
 
-    public void step(PVector delta) {
+    //behavorial bethods, def need tweaking
+    abstract protected int level();
+    abstract protected int radius();
+    abstract protected int length();
+
+    //turn wrapper
+    abstract public void doTurn();
+
+
+    //neccesary things that must happen for all snakes
+    protected void step(PVector delta) {
 	if (time%skip!=0) return;
 	System.out.println(health);
 	grow(delta);
@@ -37,19 +46,19 @@ public class Snake implements Drawable {
 	    alive = false;
     }
     
-    private void grow(PVector d) {
+    protected void grow(PVector d) {
 	PVector delta = d.normalize().mult(speed); 
 	PVector newPos = PVector.add(head.pos, delta);
-	head = new Circle(newPos, radius, fillColor, strokeColor);
+	head = new Circle(newPos, radius(), fillColor, strokeColor);
 	body.add(head);
     }
 
-    private void shrink() {
-	if (body.size() > Math.max(10, foodEaten/10))
+    protected void shrink() {
+	if (body.size() > length())
 	    body.remove();
     }
 
-    private void doHealth() {
+    protected void doHealth() {
 	if (speedMode) {
 	    speedMode = decHealth();
 	    //test if should stay speeding
@@ -64,12 +73,12 @@ public class Snake implements Drawable {
 	speedMode = false; //reset by default to not speeding, will be set back to true in ProcMain by mouse loop
     }
 
-    private void incHealth() {
-	if (health <= foodEaten)
+    protected void incHealth() {
+	if (health <= level())
 	    health += INC_STEP;
     }
 
-    private boolean decHealth() {
+    protected boolean decHealth() {
 	if (health>0) {
 	    health -= DEC_STEP;
 	    return true;
@@ -84,16 +93,17 @@ public class Snake implements Drawable {
     }
 	    
 
-    private void eat() {
+    protected int eat() {
 	Rectangle bounds = head.bounds();
+	int eaten = 0;
 	for (Food food: foodTree.within(bounds)) {
-	    if ((food.pos).dist(head.pos) <= radius + 5) { //tolerance is annoying but slightly necessary
-		//println(foodEaten++);
-		foodEaten+=food.radius;
+	    if ((food.pos).dist(head.pos) <= radius() + 5) { //tolerance is annoying but slightly necessary
+		eaten += food.radius;
 		foodTree.remove(food);
 		thingsToDraw.remove(food);
 	    }
 	}
+	return eaten;
     }
 
     public void draw() {
@@ -102,3 +112,38 @@ public class Snake implements Drawable {
     }
     
 }
+
+public class PlayerSnake extends Snake {
+    @Override
+    protected int level() {
+	return foodEaten;
+    }
+    
+    @Override
+    protected int radius() {
+	return Math.max(30, 2*Math.pow(foodEaten, 0.5));
+    }
+
+    @Override
+    protected int length() {
+	return Math.max(10, level()/10);
+    }
+
+    @Override
+    public void doTurn() {
+	PVector delta = new PVector(mouseX, mouseY).sub(screenCenter);
+	step(delta);
+    }
+
+    public PlayerSnake() {
+	initAt(screenCenter);
+    }
+
+    @Override
+    protected int eat() {
+	int eaten = super.eat();
+	foodEaten += eaten;
+	return eaten;
+    }
+}
+

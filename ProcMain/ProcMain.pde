@@ -81,7 +81,7 @@ void setup() {
     Collection<Boundary> bounds = genBounds();
     if (bounded) thingsToDraw.addAll(bounds);
     
-    snake = new Snake();
+    snake = new PlayerSnake();
     thingsToDraw.add(snake);
 
     Collection<Food> foodSet = scatterFood(int(gameRadius * gameRadius * foodDensity));
@@ -101,8 +101,7 @@ void draw() {
     time++;
     background(#FFFFFF);
     if (alive) {
-	PVector delta = new PVector(mouseX, mouseY).sub(screenCenter);
-	snake.step(delta);
+	snake.doTurn();
     }
 
     if (mousePressed) {
