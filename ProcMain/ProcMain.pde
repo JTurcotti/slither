@@ -17,8 +17,12 @@ boolean bounded = true; //for debugging, bound the snake yes or no?
 boolean alive = true; //is the snake moving?
 boolean mouseMode = false;
 
+int randomColor(int tone) {
+    return color(int(random(tone)), int(random(tone)), int(random(tone)));
+}
+
 int randomColor() {
-    return color(int(random(256)), int(random(256)), int(random(256)));
+    return randomColor(256);
 }
 
 boolean onScreen(PVector actual) {
@@ -87,10 +91,12 @@ void setup() {
 }
 
 void draw() {
+    /*
     if (System.currentTimeMillis() - lastTimeMillis < minTimeMillis)
 	return;
     lastTimeMillis = System.currentTimeMillis();
     minTimeMillis = maxMinTimeMillis; //reset min to maxmin
+    //*/
 	    
     time++;
     background(#FFFFFF);
@@ -99,9 +105,8 @@ void draw() {
 	snake.step(delta);
     }
 
-    if (mousePressed && snake.health>0) {
-	snake.health-=2;
-	minTimeMillis = maxMinTimeMillis/4;//speed up cycles by x4
+    if (mousePressed) {
+	snake.speedUp();
     }
     drawAllThings();
 }

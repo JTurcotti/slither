@@ -8,24 +8,31 @@ public class Snake implements Drawable {
     int radius = 35;
     int speed = 10;
     int health = 0;
+    int skip = 4;
+    final int SKIP_MAX = 3;
+    final int SKIP_MIN = 1;
+    private boolean speedMode = false;
+    final int DEC_STEP = 1;
+    final int INC_STEP = 1;
 
     PVector pos() {
 	return head.pos;
     }
     
     public Snake() {
-	fillColor = randomColor();
-	strokeColor = #000000;
+	fillColor = randomColor(128);
+	strokeColor = randomColor(128) + #888888;
 	head = new Circle(screenCenter, radius, fillColor, strokeColor);
 	body.add(head);
     }
 
     public void step(PVector delta) {
+	if (time%skip!=0) return;
 	System.out.println(health);
 	grow(delta);
 	eat();
 	shrink();
-	incHealth();
+	doHealth();
 	if (bounded && !gameArea.contains(head.pos))
 	    alive = false;
     }
@@ -42,10 +49,40 @@ public class Snake implements Drawable {
 	    body.remove();
     }
 
-    public void incHealth() {
-	if (health <= foodEaten)
-	    health+=1;
+    private void doHealth() {
+	if (speedMode) {
+	    speedMode = decHealth();
+	    //test if should stay speeding
+	} else {
+	    incHealth();
+	    //refresh health if not speeding
+	}
+	if (speedMode)//update speed to reflecting speeding
+	    skip = SKIP_MIN;
+	else
+	    skip = SKIP_MAX;
+	speedMode = false; //reset by default to not speeding, will be set back to true in ProcMain by mouse loop
     }
+
+    private void incHealth() {
+	if (health <= foodEaten)
+	    health += INC_STEP;
+    }
+
+    private boolean decHealth() {
+	if (health>0) {
+	    health -= DEC_STEP;
+	    return true;
+	} else {
+	    return false;
+	}
+	    
+    }
+
+    public void speedUp() {
+	speedMode = true;
+    }
+	    
 
     private void eat() {
 	Rectangle bounds = head.bounds();
