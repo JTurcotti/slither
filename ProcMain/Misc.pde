@@ -1,4 +1,4 @@
-class Rectangle {
+class Rectangle implements Drawable{
     int x1, x2, y1, y2;
     private Map<Direction, PVector> vertices = new HashMap<Direction, PVector>();
     public Rectangle(int x1, int x2, int y1, int y2) {
@@ -25,6 +25,16 @@ class Rectangle {
 
     PVector vertex(Direction d) {
 	return vertices.get(d);
+    }
+
+    PVector pos() {
+	return vertex(Direction.NW);
+    }
+
+    void draw() {
+	fill(color(0, 255, 0, 128));
+	rectMode(CORNERS);
+	rect(x1, y1, x2, y2);
     }
 }
 

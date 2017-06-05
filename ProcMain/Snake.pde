@@ -23,7 +23,7 @@ public class Snake implements Drawable {
     public void step(PVector delta) {
 	grow(delta);
 	eat();
-	if (!gameArea.contains(head.pos))
+	if (bounded && !gameArea.contains(head.pos))
 	    alive = false;
     }
     
@@ -40,7 +40,7 @@ public class Snake implements Drawable {
 	Rectangle bounds = head.bounds();
 	for (Food food: foodTree.within(bounds)) {
 	    if ((food.pos).dist(head.pos) <= radius + 5) { //tolerance is annoying but slightly necessary
-		println(foodEaten++);
+		//println(foodEaten++);
 		foodTree.remove(food);
 		thingsToDraw.remove(food);
 	    }

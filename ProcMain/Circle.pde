@@ -24,7 +24,7 @@ public class Circle implements Drawable{
     }
 
     public Rectangle bounds() {
-	int radius = this.radius + 10; //tolerance for error in collision detection
+	int radius = this.radius + 30; //tolerance for error in collision detection
 	//necessary because quadtree can only effectively search recentagles
 	return new Rectangle(int(pos.x - radius), int(pos.x + radius),
 			     int(pos.y - radius), int(pos.y + radius));

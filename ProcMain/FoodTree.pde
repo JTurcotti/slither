@@ -24,7 +24,7 @@ class Node {
     }
 }
 
-public class FoodTree {
+public class FoodTree implements Iterable<Node> {
     private Node root;
     
     public void addAll(Collection<Food> values) {
@@ -47,6 +47,7 @@ public class FoodTree {
 	    //if reached the end of a tree (or no tree to begin with) create a new node
 	    return new Node(value, layer); //pass new node
 
+	println(2);
 	Direction d = direction(n.value.pos, value.pos);
 
 	layer++;
@@ -75,22 +76,16 @@ public class FoodTree {
 	    throw new IllegalArgumentException("value not contained in tree");
 	
 	if (n.value == value) { //once reached correct node
-	    n.prev.next.remove(n.whichChild); //cut pointers to node
+	    if (n!=root)
+		n.prev.next.remove(n.whichChild); //cut pointer to node
 	    //recursively go through all children of node, adding them back to the tree
-	    Stack<Node> children = new Stack<Node>();
-	    children.push(n);
-	    while (!children.empty()) {
-		Node child = children.pop();
-		for (Node grandchild: child.children()) {
-		    if (grandchild != null) {
-			add(grandchild.value);
-			children.push(grandchild);
-		    }
-		}
-	    }
+	    for (Node child: toNodeList(n))
+		if (child != n)
+		    add(child.value);
 	} else {
 	    
 	    //go to next node in right direction
+	    println(3)
 	    Direction d = direction(n.value.pos, value.pos);
 	    remove(n.next.get(d), value);
 	}
@@ -107,30 +102,44 @@ public class FoodTree {
 	if (n==null)
 	    return;
 
+	if (mouseMode) 
+	    n.value.fillColor = color(255, 255, 0);
+			
 	if (rect.contains(n.value.pos))
 	    found.add(n.value);
 
 	for (Direction d: Direction.values()) {
-	    if (direction(n.value.pos, rect.vertex(d.opposite)) == d)
+	    println(1);
+	    if (direction(n.value.pos, rect.vertex(d)) == d) {
 		within(rect, n.next.get(d), found);
+	    }
 	}
     }
 
-    //inffecicent, should be used only for debugging
-
-    public boolean contains(Food value) {
-	return contains(root, value);
+    public Iterator<Node> iterator() {
+	return toNodeList().iterator();
     }
-
-    private boolean contains(Node n, Food value) {
-	if (n==null) return false;
-	if (n.value == value) return true;
-	for (Node child: n.children())
-	    if (contains(child, value))
-		return true;
-	return false;
+    
+    public List<Node> toNodeList() {
+	return toNodeList(root);
     }
-
+    
+    public List<Node> toNodeList(Node n) {
+	Queue<Node> eval = new ArrayDeque<Node>();
+	List<Node> nodes = new LinkedList<Node>();
+	if (n==null)
+	    return nodes;
+	eval.add(n);
+	nodes.add(n);
+	while (!eval.isEmpty()) {
+	    Node child = eval.remove();
+	    for (Node grandchild: child.children()) {
+		eval.add(grandchild);
+		nodes.add(grandchild);
+	    }
+	}
+	return nodes;
+    }
 }
 	
 		
