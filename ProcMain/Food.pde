@@ -22,8 +22,8 @@ public class Food implements Drawable{
     int fillColor;
     int radius;
 
-    PVector pos() {
-	return pos;
+    boolean render() {
+	return onScreen(pos);
     }
 
     public Food(PVector pos, int fillColor, int radius) {

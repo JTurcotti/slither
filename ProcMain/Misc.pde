@@ -45,13 +45,24 @@ class Rectangle implements Drawable{
 	return contains(v.x, v.y);
     }
 
+    Collection<PVector> vertices() {
+	List<PVector> l = new ArrayList<PVector>();
+	for (Direction d: Direction.values())
+	    l.add(vertex(d));
+	return l;
+    }  
+
     PVector vertex(Direction d) {
 	return vertices.get(d);
     }
 
-    PVector pos() {
-	return vertex(Direction.NW);
+    boolean render() {
+	for (PVector v: vertices())
+	    if (onScreen(v))
+		return true;
+	return false;
     }
+		    
 
     void draw() {
 	fill(color(0, 255, 0, 128));

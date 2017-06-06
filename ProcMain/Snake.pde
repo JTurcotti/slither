@@ -16,8 +16,11 @@ abstract public class Snake implements Drawable {
     final int INC_STEP = 1;
     abstract float turnRate(); //higher to turn faster. 0 to not turn
 
-    PVector pos() {
-	return head.pos;
+    boolean render() {
+	for (Circle c: body)
+	    if (onScreen(c.pos))
+		return true;
+	return false;
     }
 
     protected void initAt(PVector pos) {

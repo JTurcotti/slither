@@ -6,8 +6,8 @@ public class Circle implements Drawable{
     int fillColor;
     int strokeColor;
 
-    public PVector pos() {
-	return pos;
+    boolean render() {
+	return onScreen(pos);
     }
 
     public Circle(PVector pos, int radius, int fillColor, int strokeColor) {

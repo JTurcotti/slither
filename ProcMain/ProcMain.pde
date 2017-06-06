@@ -40,7 +40,7 @@ void drawAllThings() {
     //*/
     
     for (Drawable thing: thingsToDraw)
-	if (onScreen(thing.pos()))
+	if (thing.render())
 	    thing.draw();
 
     if (clearTree) {
@@ -113,8 +113,6 @@ void draw() {
     background(#FFFFFF);
     
     doAllThings();
-    if (clearTree)
-	println(snake.pos() + " " + foodTree.root.value);
 
     if (mousePressed) {
 	snake.speedUp();

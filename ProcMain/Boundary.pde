@@ -15,9 +15,8 @@ public class Boundary implements Drawable {
 	strokeWeight(1);
     }
 
-    public PVector pos() {
-	//ensure always renders
-	return PVector.sub(screenCenter, translation);
+    boolean render() {
+	return true;
     }
 }
 
