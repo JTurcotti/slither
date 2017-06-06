@@ -6,7 +6,6 @@ abstract public class Snake implements Drawable, Iterable<Circle> {
     int fillColor;
     int strokeColor;
     int speed = 10;
-    int health = 0;
     int skip = 4;
     PVector heading = new PVector(1, 0);
     final int SKIP_MAX = 2;
@@ -76,9 +75,6 @@ abstract public class Snake implements Drawable, Iterable<Circle> {
 	if (speedMode) {
 	    speedMode = decHealth();
 	    //test if should stay speeding
-	} else {
-	    incHealth();
-	    //refresh health if not speeding
 	}
 	if (speedMode)//update speed to reflecting speeding
 	    skip = SKIP_MIN;
@@ -87,20 +83,13 @@ abstract public class Snake implements Drawable, Iterable<Circle> {
 	speedMode = false; //reset by default to not speeding, will be set back to true in ProcMain by mouse loop
     }
 
-    protected void incHealth() {
-	if (health <= level())
-	    health += INC_STEP;
-    }
-
     protected boolean decHealth() {
-	if (health>0 && foodEaten > 0) {
-	    health -= DEC_STEP;
+	if (foodEaten > 0) {
 	    decLevel();
 	    return true;
 	} else {
 	    return false;
 	}
-	    
     }
 
     public void speedUp() {
@@ -179,99 +168,3 @@ abstract public class Snake implements Drawable, Iterable<Circle> {
     }
     
 }
-
-public class PlayerSnake extends Snake {
-    final float TURN_RATE = 3; //good value
-    @Override
-    float turnRate() {
-	return TURN_RATE;
-    }
-    
-    @Override
-    protected int level() {
-	return foodEaten;
-    }
-
-    @Override
-    protected void decLevel() {
-	foodEaten--;
-    }
-    
-    @Override
-    protected int radius() {
-	return Math.max(30, int(2*sqrt(level())));
-    }
-
-    @Override
-    protected int length() {
-	println("length " + Math.max(10, level()/10));
-	return Math.max(10, level()/10);
-    }
-
-    @Override
-    protected PVector nextHeading() {
-	return new PVector(mouseX, mouseY)
-	    .sub(screenCenter)
-	    .normalize();
-    }
-    
-    public PlayerSnake() {
-	initAt(ORIGIN);
-    }
-
-    @Override
-    protected void die() {
-	super.die();
-	println("game over");
-    }
-
-    @Override
-    protected int eat() {
-	int eaten = super.eat();
-	foodEaten += eaten;
-	return eaten;
-    }
-}
-
-public class ComputerSnake extends Snake {
-    final float TURN_RATE = 2; //accounts for precision in algorithms
-    @Override
-    float turnRate() {
-	//if too close too edge, turn more quickly
-	if (gameArea.contains(PVector.add(head.pos, PVector.mult(heading, 15))))
-	    return TURN_RATE;
-	else
-	    return 3 * TURN_RATE;
-    }
-    
-    int level;
-    int radius;
-    int length;
-    
-    @Override
-    protected int level() {
-	return level;}
-    @Override
-    protected void decLevel() {}
-    @Override
-    protected int radius() {
-	return radius;}
-    @Override
-    protected int length() {
-	return length;}
-
-    @Override
-    protected PVector nextHeading() {
-	return PVector
-	    .sub(foodTree.nearestTo(head.pos).pos, head.pos)
-	    .normalize();
-    }
-    
-    public ComputerSnake() {
-	initAt(randomPos());
-	level = 100 + int(random(50));
-	radius = 30 + int(random(10));
-	length = 50 + int(random(20));
-    }
-}
-
