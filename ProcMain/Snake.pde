@@ -164,7 +164,11 @@ public class ComputerSnake extends Snake {
     final float TURN_RATE = 1; //accounts for precision in algorithms
     @Override
     float turnRate() {
-	return TURN_RATE;
+	//if too close too edge, turn more quickly
+	if (gameArea.contains(PVector.add(head.pos, PVector.mult(heading, 15))))
+	    return TURN_RATE;
+	else
+	    return 3 * TURN_RATE;
     }
     
     int level;

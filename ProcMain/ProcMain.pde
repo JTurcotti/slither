@@ -31,8 +31,8 @@ PVector mouse() {
 }
 
 PVector randomPos() {
-    	return new PVector(int(random(2 * GAME_RADIUS)) - GAME_RADIUS,
-			   int(random(2 * GAME_RADIUS)) - GAME_RADIUS);
+    	return new PVector(int(random(2 * (GAME_RADIUS - 50))) - (GAME_RADIUS - 50),
+			   int(random(2 * (GAME_RADIUS - 50))) - (GAME_RADIUS - 50));
 }
 
 int randomColor() {
