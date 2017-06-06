@@ -60,8 +60,9 @@ Direction direction(PVector v1, PVector v2) {
 	return Direction.SE;
     if ((v2.x <= v1.x) && (v2.y > v1.y))
 	return Direction.SW;
-
-    throw new IllegalStateException("direction calc went wrong " + v1 + " " + v2);
+    return Direction.NW; //this could be rlllly fucked up
+    
+    //throw new IllegalStateException("direction calc went wrong " + v1 + " " + v2);
 
     
     /*
