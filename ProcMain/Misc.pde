@@ -1,3 +1,25 @@
+int randomColor(int tone) {
+    return color(int(random(tone)), int(random(tone)), int(random(tone)));
+}
+
+PVector mouse() {
+    return new PVector(mouseX, mouseY).sub(translation);
+}
+
+PVector randomPos() {
+    	return new PVector(int(random(2 * (GAME_RADIUS - 50))) - (GAME_RADIUS - 50),
+			   int(random(2 * (GAME_RADIUS - 50))) - (GAME_RADIUS - 50));
+}
+
+int randomColor() {
+    return randomColor(256);
+}
+
+boolean onScreen(PVector actual) {
+    PVector virtual = PVector.add(actual, translation);
+    return screen.contains(virtual);
+}
+
 class Rectangle implements Drawable{
     int x1, x2, y1, y2;
     private Map<Direction, PVector> vertices = new HashMap<Direction, PVector>();

@@ -161,7 +161,7 @@ public class PlayerSnake extends Snake {
 }
 
 public class ComputerSnake extends Snake {
-    final float TURN_RATE = 1; //accounts for precision in algorithms
+    final float TURN_RATE = 2; //accounts for precision in algorithms
     @Override
     float turnRate() {
 	//if too close too edge, turn more quickly

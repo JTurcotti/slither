@@ -6,6 +6,7 @@ final int GAME_RADIUS = 8192; //gameboard of sidelength gameradius * 2 (default 
 Rectangle screen;
 Rectangle gameArea;
 final float FOOD_DENSITY = .00005; //food per pixel
+final float SNAKE_DENSITY = .000001; //snakes per pizel
 final Deque<Drawable> thingsToDraw = new ArrayDeque<Drawable>(); //all things to draw
 final List<Snake> thingsToDo = new LinkedList<Snake>(); //all things to do/move
 final FoodTree foodTree = new FoodTree();
@@ -15,34 +16,12 @@ final long maxMinTimeMillis = 20; //maximum minimum time between draws
 long minTimeMillis = 0; //minimum time between draws
 long lastTimeMillis = System.currentTimeMillis(); //time of last draw
 
-final int NUM_SNAKES = 20;
-
 boolean bounded = true; //for debugging, bound the snake yes or no?
 boolean alive = true; //is the snake moving?
 boolean mouseMode = false; //debuggin modes
 boolean clearTree = false;
 
-int randomColor(int tone) {
-    return color(int(random(tone)), int(random(tone)), int(random(tone)));
-}
 
-PVector mouse() {
-    return new PVector(mouseX, mouseY).sub(translation);
-}
-
-PVector randomPos() {
-    	return new PVector(int(random(2 * (GAME_RADIUS - 50))) - (GAME_RADIUS - 50),
-			   int(random(2 * (GAME_RADIUS - 50))) - (GAME_RADIUS - 50));
-}
-
-int randomColor() {
-    return randomColor(256);
-}
-
-boolean onScreen(PVector actual) {
-    PVector virtual = PVector.add(actual, translation);
-    return screen.contains(virtual);
-}
 
 void doAllThings() {
     if (!alive) return;
@@ -110,7 +89,7 @@ void setup() {
     thingsToDraw.add(snake);
     thingsToDo.add(snake);
 
-    for (int i=0; i<NUM_SNAKES; i++) {
+    for (int i=0; i<GAME_RADIUS * GAME_RADIUS * SNAKE_DENSITY; i++) {
 	Snake s = new ComputerSnake();
 	thingsToDraw.add(s);
 	thingsToDo.add(s);
