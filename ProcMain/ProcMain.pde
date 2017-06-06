@@ -1,4 +1,4 @@
-PlayerSnake snake; //the player's snake
+PlayerSnake mainSnake; //the player's snake
 final PVector ORIGIN = new PVector(0, 0); //origin
 PVector screenCenter; //stores the center of the screen
 PVector translation; //current board translation
@@ -8,7 +8,8 @@ Rectangle gameArea;
 final float FOOD_DENSITY = .00005; //food per pixel
 final float SNAKE_DENSITY = .000001; //snakes per pizel
 final Deque<Drawable> thingsToDraw = new ArrayDeque<Drawable>(); //all things to draw
-final List<Snake> thingsToDo = new LinkedList<Snake>(); //all things to do/move
+final List<Snake> snakeList = new LinkedList<Snake>(); //all things to do/move
+Snake deathRow = null; //see doAllThings()
 final FoodTree foodTree = new FoodTree();
 int foodEaten = 0; //food eaten so far
 int time = 0; //number of times draw executed
@@ -25,11 +26,14 @@ boolean clearTree = false;
 
 void doAllThings() {
     if (!alive) return;
-    for (Snake s: thingsToDo) s.step();
+    for (Snake s: snakeList) s.step();
+    if (deathRow!=null)
+	deathRow.die();
+    deathRow = null;
 }
 
 void drawAllThings() {
-    translation = PVector.sub(screenCenter, snake.head.pos);
+    translation = PVector.sub(screenCenter, mainSnake.head.pos);
     translate(translation.x, translation.y);
 
     /*
@@ -85,14 +89,14 @@ void setup() {
     Collection<Boundary> bounds = genBounds();
     if (bounded) thingsToDraw.addAll(bounds);
     
-    snake = new PlayerSnake();
-    thingsToDraw.add(snake);
-    thingsToDo.add(snake);
+    mainSnake = new PlayerSnake();
+    thingsToDraw.add(mainSnake);
+    snakeList.add(mainSnake);
 
     for (int i=0; i<GAME_RADIUS * GAME_RADIUS * SNAKE_DENSITY; i++) {
 	Snake s = new ComputerSnake();
 	thingsToDraw.add(s);
-	thingsToDo.add(s);
+	snakeList.add(s);
     }
     
     Collection<Food> foodSet = scatterFood(int(GAME_RADIUS * GAME_RADIUS * FOOD_DENSITY));
@@ -102,6 +106,7 @@ void setup() {
 }
 
 void draw() {
+    println(foodEaten);
     /*
     if (System.currentTimeMillis() - lastTimeMillis < minTimeMillis)
 	return;
@@ -115,7 +120,7 @@ void draw() {
     doAllThings();
 
     if (mousePressed) {
-	snake.speedUp();
+	mainSnake.speedUp();
     }
     
     drawAllThings();

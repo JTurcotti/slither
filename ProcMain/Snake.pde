@@ -1,8 +1,8 @@
 import java.util.*;
 
-abstract public class Snake implements Drawable {
-    Queue<Circle> body = new ArrayDeque<Circle>(); //head represents "tail" of snake
-    Circle head; //"actual" head (tail of real deque)
+abstract public class Snake implements Drawable, Iterable<Circle> {
+    private Queue<Circle> body = new ArrayDeque<Circle>(); //head represents "tail" of snake
+    public Circle head; //"actual" head (tail of real deque)
     int fillColor;
     int strokeColor;
     int speed = 10;
@@ -12,8 +12,10 @@ abstract public class Snake implements Drawable {
     final int SKIP_MAX = 2;
     final int SKIP_MIN = 1;
     protected boolean speedMode = false;
-    final int DEC_STEP = 1;
+    final int DEC_STEP = 2;
     final int INC_STEP = 1;
+    final int TOLERANCE = 5;
+    final float DEATH_SPAWN_CHANCE = 0.2;
     abstract float turnRate(); //higher to turn faster. 0 to not turn
 
     boolean render() {
@@ -37,6 +39,14 @@ abstract public class Snake implements Drawable {
     abstract protected int length();
     abstract protected PVector nextHeading();
 
+    public Iterator<Circle> iterator() {
+	return body.iterator();
+    }
+
+    public PVector pos() {
+	return head.pos;
+    }
+    
     //neccesary things that must happen for all snakes
     public void step() {
 	if (time%skip!=0) return;
@@ -47,6 +57,7 @@ abstract public class Snake implements Drawable {
 	doHealth();
 	if (bounded && !gameArea.contains(head.pos))
 	    alive = false;
+	checkCollision();
     }
     
     protected void grow(PVector d) {
@@ -82,7 +93,7 @@ abstract public class Snake implements Drawable {
     }
 
     protected boolean decHealth() {
-	if (health>0) {
+	if (health>0 && foodEaten > 0) {
 	    health -= DEC_STEP;
 	    decLevel();
 	    return true;
@@ -95,13 +106,42 @@ abstract public class Snake implements Drawable {
     public void speedUp() {
 	speedMode = true;
     }
-	    
+
+    protected void die() {
+	for (Circle c: this) {
+	    if (random(1) < DEATH_SPAWN_CHANCE) {
+		PVector off = PVector.random2D().setMag(random(50));
+		Food f = new Food(PVector.add(c.pos, off), fillColor, 10 + int(random(radius()/3)));
+		foodTree.add(f);
+		thingsToDraw.add(f);
+	    }
+	}
+	snakeList.remove(this);
+	thingsToDraw.remove(this);
+    }
+
+    protected boolean checkCollisionWith(Snake snake) {
+	for (Circle circle: snake)
+	    if ((circle.pos).dist(head.pos) <= radius() + snake.radius() + TOLERANCE)
+		return true;
+	return false;
+    }
+
+    protected void checkCollision() {
+	for (Snake snake: snakeList)
+	    if (snake != this && snake.render() && checkCollisionWith(snake)) {
+		deathRow = this;
+		break;
+	    }
+    }
+		
+		
 
     protected int eat() {
 	Rectangle bounds = head.bounds();
 	int eaten = 0;
 	for (Food food: foodTree.within(bounds)) {
-	    if ((food.pos).dist(head.pos) <= radius() + 5) { //tolerance is annoying but slightly necessary
+	    if ((food.pos).dist(head.pos) <= radius() + TOLERANCE) { //tolerance is annoying but slightly necessary
 		eaten += food.radius;
 		foodTree.remove(food);
 		thingsToDraw.remove(food);
@@ -159,11 +199,12 @@ public class PlayerSnake extends Snake {
     
     @Override
     protected int radius() {
-	return Math.max(30, int(2*sqrt(foodEaten)));
+	return Math.max(30, int(2*sqrt(level())));
     }
 
     @Override
     protected int length() {
+	println("length " + Math.max(10, level()/10));
 	return Math.max(10, level()/10);
     }
 
@@ -176,6 +217,12 @@ public class PlayerSnake extends Snake {
     
     public PlayerSnake() {
 	initAt(ORIGIN);
+    }
+
+    @Override
+    protected void die() {
+	super.die();
+	println("game over");
     }
 
     @Override
