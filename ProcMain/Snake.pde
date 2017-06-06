@@ -14,7 +14,7 @@ abstract public class Snake implements Drawable {
     protected boolean speedMode = false;
     final int DEC_STEP = 1;
     final int INC_STEP = 1;
-    final int TURN_RATE = 4; //higher to turn faster. 0 to not turn
+    abstract float turnRate(); //higher to turn faster. 0 to not turn
 
     PVector pos() {
 	return head.pos;
@@ -29,6 +29,7 @@ abstract public class Snake implements Drawable {
 
     //behavorial bethods, def need tweaking
     abstract protected int level();
+    abstract protected void decLevel();
     abstract protected int radius();
     abstract protected int length();
     abstract protected PVector nextHeading();
@@ -36,8 +37,7 @@ abstract public class Snake implements Drawable {
     //neccesary things that must happen for all snakes
     public void step() {
 	if (time%skip!=0) return;
-	System.out.println(health);
-	heading = PVector.add(heading, nextHeading().mult(TURN_RATE)).normalize();
+	heading = PVector.add(heading, nextHeading().mult(turnRate())).normalize();
 	grow(heading);
 	eat();
 	shrink();
@@ -81,6 +81,7 @@ abstract public class Snake implements Drawable {
     protected boolean decHealth() {
 	if (health>0) {
 	    health -= DEC_STEP;
+	    decLevel();
 	    return true;
 	} else {
 	    return false;
@@ -114,9 +115,20 @@ abstract public class Snake implements Drawable {
 }
 
 public class PlayerSnake extends Snake {
+    final float TURN_RATE = 3; //good value
+    @Override
+    float turnRate() {
+	return TURN_RATE;
+    }
+    
     @Override
     protected int level() {
 	return foodEaten;
+    }
+
+    @Override
+    protected void decLevel() {
+	foodEaten--;
     }
     
     @Override
@@ -137,7 +149,7 @@ public class PlayerSnake extends Snake {
     }
     
     public PlayerSnake() {
-	initAt(screenCenter);
+	initAt(ORIGIN);
     }
 
     @Override
@@ -149,6 +161,12 @@ public class PlayerSnake extends Snake {
 }
 
 public class ComputerSnake extends Snake {
+    final float TURN_RATE = 1; //accounts for precision in algorithms
+    @Override
+    float turnRate() {
+	return TURN_RATE;
+    }
+    
     int level;
     int radius;
     int length;
@@ -156,6 +174,8 @@ public class ComputerSnake extends Snake {
     @Override
     protected int level() {
 	return level;}
+    @Override
+    protected void decLevel() {}
     @Override
     protected int radius() {
 	return radius;}

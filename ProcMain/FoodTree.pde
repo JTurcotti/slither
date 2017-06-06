@@ -116,14 +116,21 @@ public class FoodTree implements Iterable<Node> {
     }
 
     public Food nearestTo(PVector v) {
-	return nearestTo(root, v);
+	List<Node> potential = nearestTo(root, v);
+	final PVector w = new PVector(v.x, v.y); //necessary to use in anon
+	return Collections.min(potential, new Comparator<Node>() {
+		public int compare(Node one, Node two) {
+		    return int(one.value.pos.dist(w) -
+			       two.value.pos.dist(w));
+		}
+	    }).value;
     }
 
-    private Food nearestTo(Node n, PVector v) {
+    private List<Node> nearestTo(Node n, PVector v) {
 	Direction d = direction(n.value.pos, v);
 	Node child = n.next.get(d);
 	if (child==null)
-	    return n.value;
+	    return toNodeList(n==root? n: n.prev);
 	return nearestTo(child, v);
     }
 	
@@ -135,7 +142,8 @@ public class FoodTree implements Iterable<Node> {
     public List<Node> toNodeList() {
 	return toNodeList(root);
     }
-    
+
+    //generates list of node and all children
     public List<Node> toNodeList(Node n) {
 	Queue<Node> eval = new ArrayDeque<Node>();
 	List<Node> nodes = new LinkedList<Node>();

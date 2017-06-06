@@ -4,8 +4,14 @@ Collection<Food> scatterFood(int num) {
     Set<Food> food = new HashSet<Food>();
     while (num-->0) {
 	PVector pos = randomPos();
-	int fillColor = randomColor();
-	int radius = 10 + int(random(10));
+	int fillColor, radius;
+	if (clearTree) {
+	    fillColor = color(128);
+	    radius = 10;
+	} else {
+	    fillColor = randomColor();
+	    radius = 10 + int(random(10));
+	}
 	food.add(new Food(pos, fillColor, radius));
     }
     return food;
