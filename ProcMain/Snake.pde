@@ -111,8 +111,31 @@ abstract public class Snake implements Drawable {
     }
 
     public void draw() {
+	int radius = radius();
 	for (Circle c: body)
 	    c.draw();
+	PVector center = head.pos;
+	PVector direction = nextHeading();
+	PVector leftCenter = new PVector(heading.x, heading.y)
+	    .rotate(QUARTER_PI)
+	    .setMag(radius/2)
+	    .add(center);
+	PVector rightCenter = new PVector(heading.x, heading.y)
+	    .rotate( -1 * QUARTER_PI)
+	    .setMag(radius/2)
+	    .add(center);
+	(new Circle(leftCenter, radius/4, #FFFFFF, #FFFFFF)).draw();
+	(new Circle(rightCenter, radius/4, #FFFFFF, #FFFFFF)).draw();
+	PVector leftOffCenter = mouse()
+	    .sub(center)
+	    .setMag(radius/6)
+	    .add(leftCenter);
+	PVector rightOffCenter = mouse()
+	    .sub(center)
+	    .setMag(radius/6)
+	    .add(rightCenter);
+	(new Circle(leftOffCenter, radius/6, #000000, #000000)).draw();
+	(new Circle(rightOffCenter, radius/6, #000000, #000000)).draw();
     }
     
 }
