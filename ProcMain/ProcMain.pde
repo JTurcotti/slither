@@ -10,8 +10,8 @@ final float SNAKE_DENSITY = .000001; //snakes per pizel
 final Deque<Drawable> thingsToDraw = new ArrayDeque<Drawable>(); //all things to draw
 final List<Snake> snakeList = new LinkedList<Snake>(); //all things to do/move
 Snake deathRow = null; //see doAllThings()
+final Queue<Circle> circleList = new ArrayDeque<Circle>(); //keeps track of all circles in game; justification for why this works as a queue is vague, but seems to work so ok
 final FoodTree foodTree = new FoodTree();
-int foodEaten = 0; //food eaten so far
 int time = 0; //number of times draw executed
 final long maxMinTimeMillis = 20; //maximum minimum time between draws
 long minTimeMillis = 0; //minimum time between draws
@@ -106,7 +106,14 @@ void setup() {
 }
 
 void draw() {
-    println(foodEaten);
+    try {
+	mainStep();
+    } catch (Exception e) {
+	e.printStackTrace();
+    }
+}
+
+void mainStep() {
     /*
     if (System.currentTimeMillis() - lastTimeMillis < minTimeMillis)
 	return;

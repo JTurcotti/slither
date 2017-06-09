@@ -20,7 +20,6 @@ boolean onScreen(PVector actual) {
     return screen.contains(virtual);
 }
 
-
 enum Direction {
     NW, NE, SE, SW;
 

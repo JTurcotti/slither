@@ -11,6 +11,10 @@ public class Circle implements Drawable{
     }
 
     public Circle(PVector pos, int radius, int fillColor, int strokeColor) {
+	if (radius <= 0)
+	    throw new IllegalArgumentException("radius must be +");
+	if (pos == null || Float.isNaN(pos.x) || Float.isNaN(pos.y))
+	    throw new IllegalArgumentException("position objects is null or contains NaN values");
 	this.pos = pos;
 	this.radius = radius;
 	this.fillColor = fillColor;
@@ -29,4 +33,9 @@ public class Circle implements Drawable{
 	return new Rectangle(int(pos.x - radius), int(pos.x + radius),
 			     int(pos.y - radius), int(pos.y + radius));
     }
+
+    public float dist(Circle other) {
+	return (this.pos).dist(other.pos);
+    }
+
 }

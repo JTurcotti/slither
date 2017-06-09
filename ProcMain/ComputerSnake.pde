@@ -1,5 +1,7 @@
 public class ComputerSnake extends Snake {
     final float TURN_RATE = 2; //accounts for precision in algorithms
+    final float DANGER_RADIUS = 20;
+    
     @Override
     float turnRate() {
 	//if too close too edge, turn more quickly
@@ -9,36 +11,46 @@ public class ComputerSnake extends Snake {
 	    return 3 * TURN_RATE;
     }
     
-    int level;
-    int radius;
-    int length;
-    
-    @Override
-    protected int level() {
-	return level;}
-    @Override
-    protected void decLevel() {
-	level--;
-    }
-    @Override
-    protected int radius() {
-	return radius;}
-    @Override
-    protected int length() {
-	return length;}
-
     @Override
     protected PVector nextHeading() {
-	return PVector
-	    .sub(foodTree.nearestTo(head.pos).pos, head.pos)
-	    .normalize();
+	//	PVector danger = safestHeading();
+	//	if (danger == null)
+	    return PVector
+		.sub(foodTree.nearestTo(head.pos).pos, head.pos)
+		.normalize();
+	    //	return danger.normalize();
     }
     
     public ComputerSnake() {
 	initAt(randomPos());
-	level = 100 + int(random(50));
-	radius = 30 + int(random(10));
-	length = 50 + int(random(20));
+	eaten = 100 + int(random(50));
     }
+
+    @Override
+    protected void die() {
+	super.die();
+
+	//spawn some number of new snakes
+	for (int i=0; i<int(random(5)); i++) {
+	    Snake s = new ComputerSnake();
+	    thingsToDraw.add(s);
+	    snakeList.add(s);
+	}
+    }
+
+    private PVector safestHeading() {
+	PVector heading = new PVector(0, 0);
+	NavigableSet<Circle> danger = dangerList(); //yes its costly to calculate
+	if (danger.size() == 0 || (danger.first()).dist(head) >= DANGER_RADIUS)
+	    return null; //irrelevant result
+	for (Circle c: danger) {//gauranteed to go in ascending order of distance
+	    PVector subHeading = PVector.sub(head.pos, c.pos);
+	    subHeading.setMag(1 / (1 + subHeading.mag()));
+	    heading.add(subHeading);
+	}
+	return heading;
+    }
+
+    
 }
 
