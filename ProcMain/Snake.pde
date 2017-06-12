@@ -16,6 +16,8 @@ abstract public class Snake implements Drawable, Iterable<Circle> {
     final int INC_STEP = 1;
     final int TOLERANCE = 5;
     final float DEATH_SPAWN_CHANCE = 0.3;
+    final int SCAT_SIZE = 7;
+    final float SCAT_CHANCE = 0.1;
     abstract float turnRate(); //higher to turn faster. 0 to not turn
 
     boolean render() {
@@ -64,6 +66,12 @@ abstract public class Snake implements Drawable, Iterable<Circle> {
 	    alive = false;
 	checkCollision();
     }
+
+    private void dropTrail() {
+	Food scat = new Food(body.element().pos, fillColor, SCAT_SIZE);
+	foodTree.add(scat);
+	thingsToDraw.add(scat);
+    }
     
     protected void grow(PVector d) {
 	PVector delta = d.mult(speed); 
@@ -96,6 +104,8 @@ abstract public class Snake implements Drawable, Iterable<Circle> {
     protected boolean decHealth() {
 	if (eaten > 0) {
 	    eaten--;
+	    if (random(1)<SCAT_CHANCE)
+		dropTrail();
 	    return true;
 	} else {
 	    return false;
