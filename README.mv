@@ -1,1 +1,30 @@
-run it
+To run the game:
+processing-java --sketch=./ProcMain --run
+nix
+or
+processing-java --sketch=%CD%\ProcMain --run
+windows
+
+Use the mouse to guide your snake around
+if you eat food you grow bigger
+you can hold down the mouse to go faster but you shrink in the process of doing so
+if you run into another snake you die
+if another snake runs into you it dies
+try not to die
+
+upcoming features:
+snakes will try harder to kill you
+snakes will try harder not to be killed by you
+snakes will be prettier
+
+Development log:
+you were created
+your food was created
+you started eating your food
+your friends were created
+your friends started eating your food
+you started killing your friends
+your friends started killing you (though not on purpose)
+
+Credits:
+Joshua
